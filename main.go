@@ -7,14 +7,18 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
-	seconds, err := getIdleTime()
-	if err != nil {
-		log.Fatalf("%v", err)
+	for {
+		time.Sleep(1 * time.Second)
+		seconds, err := getIdleTime()
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+		log.Printf("Idle %d seconds", seconds)
 	}
-	log.Printf("Idle %d seconds", seconds)
 }
 
 // returns idle time in seconds
