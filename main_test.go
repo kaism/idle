@@ -1,31 +1,55 @@
 package main
 
 import (
-	"bytes"
+	"errors"
 	"testing"
 )
 
-func TestXprintidle(t *testing.T) {
-	got := xprintidle()
-	got = got[:len(got)-1] // remove /n
-	if !bytesAreNumbers(t, got) {
-		t.Errorf("unexpected result from xprintidle: '%s'", got)
-	}
+func TestBytesAreDigits(t *testing.T) {
+	t.Run("all digits", func(t *testing.T) {
+		slice := []byte{48, 49, 50, 51, 52, 53, 54, 55, 56, 57}
+		got := bytesAreDigits(slice)
+		want := true
+		assertBool(t, got, want)
+	})
+	t.Run("contains non-digit", func(t *testing.T) {
+		slice := []byte{10}
+		got := bytesAreDigits(slice)
+		want := false
+		assertBool(t, got, want)
+	})
+}
+func TestCheckXprintidle(t *testing.T) {
+	t.Run("not installed error", func(t *testing.T) {
+		err := errors.New("exec: \"xprintidle\": executable file not found in $PATH")
+		got := checkXprintidle([]byte{}, err)
+		assertError(t, got, ErrXprintidleRun)
+	})
+	t.Run("unexpected result error", func(t *testing.T) {
+		output := []byte{}
+		got := checkXprintidle(output, nil)
+		assertError(t, got, ErrXprintidleResult)
+	})
 }
 
-// check that each byte in a slice is a number
-func bytesAreNumbers(t *testing.T, s []byte) bool {
-
-	// utf8 decimal codes for 0-9
-	numbers := []byte{48, 49, 50, 51, 52, 53, 54, 55, 56, 57}
-
-	for i := 0; i < len(s); i++ {
-		b := []byte{s[i]}
-		if bytes.Contains(numbers, b) {
-			continue
-		} else {
-			return false
-		}
+func assertBool(t *testing.T, got, want bool) {
+	t.Helper()
+	if got != want {
+		t.Errorf("got '%t' want '%t'", got, want)
 	}
-	return true
+}
+func assertError(t *testing.T, got, want error) {
+	t.Helper()
+	if got == nil {
+		t.Errorf("wanted error but didn't get one")
+	}
+	if got != want {
+		t.Errorf("got '%s' want '%s'", got, want)
+	}
+}
+func assertNoError(t *testing.T, got error) {
+	t.Helper()
+	if got != nil {
+		t.Errorf("got an error but didn't want one: %v", got)
+	}
 }
