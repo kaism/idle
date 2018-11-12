@@ -5,6 +5,18 @@ import (
 	"testing"
 )
 
+func TestParseXprintidleOutput(t *testing.T) {
+	t.Run("parse byte slice to int", func(t *testing.T) {
+		got, _ := parseXprintidleOutput([]byte{49, 48, 50, 51, 52, 53, 54, 55, 56, 57})
+		want := 1023456789
+		assertInt(t, got, want)
+	})
+	t.Run("strconv.Atoi parse error", func(t *testing.T) {
+		_, got := parseXprintidleOutput([]byte{10})
+		want := ErrParse
+		assertError(t, got, want)
+	})
+}
 func TestBytesAreDigits(t *testing.T) {
 	t.Run("all digits", func(t *testing.T) {
 		slice := []byte{48, 49, 50, 51, 52, 53, 54, 55, 56, 57}
@@ -32,6 +44,12 @@ func TestCheckXprintidle(t *testing.T) {
 	})
 }
 
+func assertInt(t *testing.T, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("got '%d' want '%d'", got, want)
+	}
+}
 func assertBool(t *testing.T, got, want bool) {
 	t.Helper()
 	if got != want {
@@ -42,8 +60,7 @@ func assertError(t *testing.T, got, want error) {
 	t.Helper()
 	if got == nil {
 		t.Errorf("wanted error but didn't get one")
-	}
-	if got != want {
+	} else if got != want {
 		t.Errorf("got '%s' want '%s'", got, want)
 	}
 }
