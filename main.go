@@ -11,22 +11,26 @@ import (
 )
 
 var interval = 1 * time.Second
-var threshold = 3 // in seconds
+var threshold = 5 // in seconds
+var timeFormat = "Mon Jan 2 15:04:05 MST 2006"
 
 func main() {
 	var idle bool = false
+	var start time.Time
+
 	for {
 		time.Sleep(interval)
 		seconds, err := getIdleTime()
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
-
 		if changeState(&idle, threshold, seconds) {
 			if idle {
-				log.Println("Idle start")
+				start = time.Now().Add(-time.Duration(seconds) * time.Second)
+				log.Printf("Idle since %v", start.Format(timeFormat))
 			} else {
-				log.Println("Idle stop")
+				duration := time.Since(start)
+				log.Printf("Idle for %v", duration)
 			}
 		}
 	}
@@ -71,7 +75,7 @@ func parseXprintidleOutput(bytes []byte) (int, error) {
 	str := strings.TrimSpace(string(bytes))
 	num, err := strconv.Atoi(str)
 	if err != nil {
-		return num, ErrParse
+		return num, errParse
 	}
 	return num, err
 }
@@ -79,16 +83,16 @@ func parseXprintidleOutput(bytes []byte) (int, error) {
 // checks that xprintidle ran and output is what we expect, eg: 1234\n
 func checkXprintidle(output []byte, inErr error) error {
 	if inErr != nil {
-		return ErrXprintidleRun
+		return errXprintidleRun
 	}
 	if len(output) < 1 {
-		return ErrXprintidleResult
+		return errXprintidleResult
 	}
 	if output[len(output)-1] == 10 { // remove /n
 		output = output[:len(output)-1]
 	}
 	if !bytesAreDigits(output) {
-		return ErrXprintidleResult
+		return errXprintidleResult
 	}
 	return nil
 }
@@ -105,6 +109,6 @@ func bytesAreDigits(s []byte) bool {
 	return true
 }
 
-var ErrXprintidleRun = errors.New("error running xprintidle (not installed?)")
-var ErrXprintidleResult = errors.New("unexpected result from xprintidle")
-var ErrParse = errors.New("parse error")
+var errXprintidleRun = errors.New("error running xprintidle (not installed?)")
+var errXprintidleResult = errors.New("unexpected result from xprintidle")
+var errParse = errors.New("parse error")

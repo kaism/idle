@@ -73,7 +73,7 @@ func TestParseXprintidleOutput(t *testing.T) {
 	})
 	t.Run("strconv.Atoi parse error", func(t *testing.T) {
 		_, got := parseXprintidleOutput([]byte{10})
-		want := ErrParse
+		want := errParse
 		assertError(t, got, want)
 	})
 }
@@ -95,12 +95,12 @@ func TestCheckXprintidle(t *testing.T) {
 	t.Run("not installed error", func(t *testing.T) {
 		err := errors.New("exec: \"xprintidle\": executable file not found in $PATH")
 		got := checkXprintidle([]byte{}, err)
-		assertError(t, got, ErrXprintidleRun)
+		assertError(t, got, errXprintidleRun)
 	})
 	t.Run("unexpected result error", func(t *testing.T) {
 		output := []byte{}
 		got := checkXprintidle(output, nil)
-		assertError(t, got, ErrXprintidleResult)
+		assertError(t, got, errXprintidleResult)
 	})
 }
 
