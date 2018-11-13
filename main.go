@@ -12,8 +12,8 @@ import (
 )
 
 const interval = 1 * time.Second
-const threshold = 5 * 60 // in seconds
-const timeFormat = "Mon Jan 2 15:04:05 MST 2006"
+const threshold = 1 * 60 // in seconds
+const timeFormat = "Mon Jan 2 15:04:05"
 
 func main() {
 	var idle bool = false
@@ -41,7 +41,7 @@ func main() {
 				fmt.Printf(" for %s\n", duration)
 				// begin work statement
 				startWork = time.Now()
-				fmt.Printf("%v Work", startIdle.Format(timeFormat))
+				fmt.Printf("%v Work", startWork.Format(timeFormat))
 
 			}
 		}
