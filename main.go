@@ -11,16 +11,15 @@ import (
 	"time"
 )
 
-const interval = 1 * time.Second
-const threshold = 1 * 60 // in seconds
+const interval time.Duration = 1 * time.Second
+const threshold int = 1 * 60 // in seconds
 const timeFormat = "Mon Jan 2 15:04:05"
 
 func main() {
 	var idle bool = false
-	var startIdle time.Time
-	var startWork time.Time = time.Now()
+	var start time.Time = time.Now()
 
-	fmt.Printf("%v Work", startWork.Format(timeFormat))
+	fmt.Printf("%v Work ", start.Format(timeFormat))
 	for {
 		time.Sleep(interval)
 		seconds, err := getIdleTime()
@@ -28,24 +27,29 @@ func main() {
 			log.Fatalf("%v", err)
 		}
 		if changeState(&idle, threshold, seconds) {
+			var end time.Time
 			if idle {
-				// complete work statement
-				duration := time.Since(startWork).Truncate(time.Second).String()
-				fmt.Printf(" for %s\n", duration)
-				// begin idle statement
-				startIdle = time.Now().Add(-time.Duration(seconds) * time.Second)
-				fmt.Printf("%v Idle", startIdle.Format(timeFormat))
+				end = time.Now().Add(-time.Duration(threshold))
 			} else {
-				// complete idle statement
-				duration := time.Since(startIdle).Truncate(time.Second).String()
-				fmt.Printf(" for %s\n", duration)
-				// begin work statement
-				startWork = time.Now()
-				fmt.Printf("%v Work", startWork.Format(timeFormat))
-
+				end = time.Now().Add(-interval)
 			}
+			fmt.Printf(stateChangeMsg(idle, start, end))
+			start = end
 		}
 	}
+}
+
+// returns state change message (start and end are for the previous state)
+func stateChangeMsg(idle bool, start, end time.Time) string {
+	duration := end.Sub(start).Truncate(time.Second).String()
+	str := fmt.Sprintf("for %s\n", duration)
+	str += fmt.Sprintf("%v", end.Format(timeFormat))
+	if idle {
+		str += " Idle "
+	} else {
+		str += " Work "
+	}
+	return str
 }
 
 // returns true if the state was changed
