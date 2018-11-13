@@ -5,6 +5,66 @@ import (
 	"testing"
 )
 
+func TestChangeState(t *testing.T) {
+	threshold := 5 * 60
+	t.Run("returns true when changed", func(t *testing.T) {
+		t.Run("idle to not idle", func(t *testing.T) {
+			idle := true
+			seconds := 0
+			got := changeState(&idle, threshold, seconds)
+			assertBool(t, got, true)
+		})
+		t.Run("not idle to idle", func(t *testing.T) {
+			idle := false
+			seconds := (5 * 60) + 1
+			got := changeState(&idle, threshold, seconds)
+			assertBool(t, got, true)
+		})
+	})
+	t.Run("returns false when not changed", func(t *testing.T) {
+		t.Run("idle to idle", func(t *testing.T) {
+			idle := true
+			seconds := (5 * 60) + 2
+			got := changeState(&idle, threshold, seconds)
+			assertBool(t, got, false)
+		})
+		t.Run("not idle to not idle", func(t *testing.T) {
+			idle := false
+			seconds := 0
+			got := changeState(&idle, threshold, seconds)
+			assertBool(t, got, false)
+		})
+	})
+	t.Run("changes idle when it should", func(t *testing.T) {
+		t.Run("idle to not idle", func(t *testing.T) {
+			idle := true
+			seconds := 0
+			_ = changeState(&idle, threshold, seconds)
+			assertBool(t, idle, false)
+		})
+		t.Run("not idle to idle", func(t *testing.T) {
+			idle := false
+			seconds := (5 * 60) + 1
+			_ = changeState(&idle, threshold, seconds)
+			assertBool(t, idle, true)
+		})
+	})
+	t.Run("doesn't change idle when it shouldn't", func(t *testing.T) {
+		t.Run("idle to idle", func(t *testing.T) {
+			idle := true
+			seconds := (5 * 60) + 2
+			_ = changeState(&idle, threshold, seconds)
+			assertBool(t, idle, true)
+		})
+		t.Run("not idle to not idle", func(t *testing.T) {
+			idle := false
+			seconds := 0
+			_ = changeState(&idle, threshold, seconds)
+			assertBool(t, idle, false)
+		})
+	})
+
+}
 func TestParseXprintidleOutput(t *testing.T) {
 	t.Run("parse byte slice to int", func(t *testing.T) {
 		got, _ := parseXprintidleOutput([]byte{49, 48, 50, 51, 52, 53, 54, 55, 56, 57})

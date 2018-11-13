@@ -10,15 +10,39 @@ import (
 	"time"
 )
 
+var interval = 1 * time.Second
+var threshold = 3 // in seconds
+
 func main() {
+	var idle bool = false
 	for {
-		time.Sleep(1 * time.Second)
+		time.Sleep(interval)
 		seconds, err := getIdleTime()
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
-		log.Printf("Idle %d seconds", seconds)
+
+		if changeState(&idle, threshold, seconds) {
+			if idle {
+				log.Println("Idle start")
+			} else {
+				log.Println("Idle stop")
+			}
+		}
 	}
+}
+
+// returns true if the state was changed
+func changeState(idle *bool, threshold int, seconds int) bool {
+	if seconds >= threshold && !*idle {
+		*idle = true
+		return true
+	}
+	if seconds < threshold && *idle {
+		*idle = false
+		return true
+	}
+	return false
 }
 
 // returns idle time in seconds
