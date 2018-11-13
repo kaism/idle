@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"log"
 	"os/exec"
 	"strconv"
@@ -10,14 +11,16 @@ import (
 	"time"
 )
 
-var interval = 1 * time.Second
-var threshold = 5 // in seconds
-var timeFormat = "Mon Jan 2 15:04:05 MST 2006"
+const interval = 1 * time.Second
+const threshold = 1 * 60 // in seconds
+const timeFormat = "Mon Jan 2 15:04:05"
 
 func main() {
 	var idle bool = false
-	var start time.Time
+	var startIdle time.Time
+	var startWork time.Time = time.Now()
 
+	fmt.Printf("%v Work", startWork.Format(timeFormat))
 	for {
 		time.Sleep(interval)
 		seconds, err := getIdleTime()
@@ -26,11 +29,20 @@ func main() {
 		}
 		if changeState(&idle, threshold, seconds) {
 			if idle {
-				start = time.Now().Add(-time.Duration(seconds) * time.Second)
-				log.Printf("Idle since %v", start.Format(timeFormat))
+				// complete work statement
+				duration := time.Since(startWork).Truncate(time.Second).String()
+				fmt.Printf(" for %s\n", duration)
+				// begin idle statement
+				startIdle = time.Now().Add(-time.Duration(seconds) * time.Second)
+				fmt.Printf("%v Idle", startIdle.Format(timeFormat))
 			} else {
-				duration := time.Since(start)
-				log.Printf("Idle for %v", duration)
+				// complete idle statement
+				duration := time.Since(startIdle).Truncate(time.Second).String()
+				fmt.Printf(" for %s\n", duration)
+				// begin work statement
+				startWork = time.Now()
+				fmt.Printf("%v Work", startWork.Format(timeFormat))
+
 			}
 		}
 	}
