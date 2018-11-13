@@ -12,7 +12,7 @@ import (
 )
 
 const interval time.Duration = 1 * time.Second
-const threshold int = 1 * 60 // in seconds
+const threshold int = 2 * 60 // in seconds
 const timeFormat = "Mon Jan 2 15:04:05"
 
 func main() {
@@ -28,8 +28,9 @@ func main() {
 		}
 		if changeState(&idle, threshold, seconds) {
 			var end time.Time
+			thresholdDuration := time.Duration(threshold) * time.Second
 			if idle {
-				end = time.Now().Add(-time.Duration(threshold))
+				end = time.Now().Add(-thresholdDuration)
 			} else {
 				end = time.Now().Add(-interval)
 			}
