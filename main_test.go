@@ -6,34 +6,6 @@ import (
 	"time"
 )
 
-// func TestCalcPreviousStateEnd(t *testing.T) {
-// 	threshold := 5 * time.Minute
-// 	interval := 1 * time.Second
-
-// 	// start 18:20, worked for 10 mins
-// 	// now it's 18:35 and we get idle flag after 5 mins* idle		* threshold
-// 	// end of work was 5 mins* ago at 18:30							* threshold
-// 	t.Run("previous state was work", func(t *testing.T) {
-// 		idle := true
-// 		now := time.Date(2018, time.November, 10, 18, 35, 0, 0, time.UTC)
-
-// 		got := calcPreviousStateEnd(idle, now, threshold, interval)
-// 		want := time.Date(2018, time.November, 10, 18, 30, 0, 0, time.UTC)
-// 		assertTime(t, got, want)
-// 	})
-// 	// start 18:30:00, was idle for 10 mins
-// 	// now it's 18:40 we get work flag
-// 	// end of idle is up to but not including 1 sec* ago 			* interval
-// 	t.Run("previous state was idle", func(t *testing.T) {
-// 		idle := false
-// 		now := time.Date(2018, time.November, 10, 18, 35, 0, 0, time.UTC)
-
-// 		got := calcPreviousStateEnd(idle, now, threshold, interval)
-// 		want := time.Date(2018, time.November, 10, 18, 34, 59, 0, time.UTC)
-// 		assertTime(t, got, want)
-// 	})
-// }
-
 func TestStateChangeMsg(t *testing.T) {
 	t.Run("work to idle", func(t *testing.T) {
 		idle := true
