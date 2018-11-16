@@ -1,2 +1,5 @@
 # idle
-go script to track idle time on debian
+
+CLI written in go to track idle time.
+
+Requirements: Debian-based system, xprintidle
