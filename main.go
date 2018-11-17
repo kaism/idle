@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/getlantern/systray"
 	"log"
 	"time"
 )
@@ -11,6 +12,8 @@ const threshold int = 2 * 60 // in seconds
 const timeFormat = "Mon Jan 2 15:04:05"
 
 func main() {
+	systray.Run(onReady, onExit)
+
 	var idle bool = false
 	var start time.Time = time.Now()
 
