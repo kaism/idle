@@ -7,26 +7,15 @@ import (
 
 func onReady() {
 	systray.SetIcon(icon.Dino)
-	mToggle := systray.AddMenuItem("Set Idle", "")
-	go func() {
-		idle := true
-		for {
-			select {
-			case <-mToggle.ClickedCh:
-				if idle {
-					mToggle.SetTitle("Set Work")
-					systray.SetIcon(icon.DinoSleep)
-					idle = false
-				} else {
-					mToggle.SetTitle("Set Idle")
-					systray.SetIcon(icon.Dino)
-					idle = true
-				}
-			}
+	mQuit := systray.AddMenuItem("Quit", "")
+	for {
+		select {
+		case <-mQuit.ClickedCh:
+			systray.Quit()
+			abort <- struct{}{}
 		}
-	}()
+	}
 }
 
 func onExit() {
-	systray.Quit()
 }
