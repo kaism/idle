@@ -6,6 +6,21 @@ import (
 	"time"
 )
 
+func TestStateStartMsg(t *testing.T) {
+	start := time.Date(2018, time.November, 10, 18, 20, 40, 0, time.UTC)
+	got := stateStartMsg(start)
+	want := "Sat Nov 10 18:20:40 Work "
+	assertString(t, got, want)
+}
+
+func TestStateFinishMsg(t *testing.T) {
+	start := time.Date(2018, time.November, 10, 18, 20, 40, 0, time.UTC)
+	end := time.Date(2018, time.November, 10, 19, 25, 0, 0, time.UTC)
+	got := stateFinishMsg(start, end)
+	want := "for 1h4m20s\n"
+	assertString(t, got, want)
+}
+
 func TestStateChangeMsg(t *testing.T) {
 	t.Run("work to idle", func(t *testing.T) {
 		idle := true

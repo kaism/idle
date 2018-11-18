@@ -25,7 +25,7 @@ func main() {
 	var idle bool = false
 	var start time.Time = time.Now()
 
-	fmt.Printf("%v Work ", start.Format(timeFormat))
+	fmt.Printf(stateStartMsg(start))
 	tick := time.Tick(interval)
 loop:
 	for {
@@ -50,6 +50,8 @@ loop:
 			// log.Printf("tick")
 		case <-abort:
 			// log.Printf("abort")
+			end := time.Now().Add(-interval)
+			fmt.Print(stateFinishMsg(start, end))
 			break loop
 		}
 	}

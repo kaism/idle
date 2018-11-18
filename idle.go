@@ -14,6 +14,17 @@ var errXprintidleRun = errors.New("error running xprintidle (not installed?)")
 var errXprintidleResult = errors.New("unexpected result from xprintidle")
 var errParse = errors.New("parse error")
 
+// returns start message, call on start tracking
+func stateStartMsg(start time.Time) string {
+	return fmt.Sprintf("%v Work ", start.Format(timeFormat))
+}
+
+// returns finish message, call on end tracking
+func stateFinishMsg(start, end time.Time) string {
+	duration := end.Sub(start).Truncate(time.Second).String()
+	return fmt.Sprintf("for %s\n", duration)
+}
+
 // returns state change message (start and end are for the previous state)
 func stateChangeMsg(idle bool, start, end time.Time) string {
 	duration := end.Sub(start).Truncate(time.Second).String()
