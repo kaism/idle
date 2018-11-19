@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/getlantern/systray"
 	"github.com/sfkrystal/idle/icon"
@@ -9,11 +10,19 @@ import (
 	"time"
 )
 
-const interval time.Duration = 1 * time.Second
-const threshold int = 5 * 60 // in seconds
-const timeFormat = "Mon Jan 2 15:04:05"
+const (
+	interval         time.Duration = 1 * time.Second
+	defaultThreshold int           = 5 * 60 // in seconds
+	timeFormat       string        = "Mon Jan 2 15:04:05"
+)
 
 var abort = make(chan struct{})
+var threshold int
+
+func init() {
+	flag.IntVar(&threshold, "threshold", defaultThreshold, "Duration in seconds to begin idle, eg 300 for 5 minutes.")
+	flag.Parse()
+}
 
 func main() {
 	go func() {
@@ -50,9 +59,7 @@ loop:
 
 		select {
 		case <-tick:
-			// log.Printf("tick")
 		case <-abort:
-			// log.Printf("abort")
 			end := time.Now().Add(-interval)
 			fmt.Print(stateFinishMsg(start, end))
 			break loop
