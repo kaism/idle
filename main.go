@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/getlantern/systray"
+	"github.com/sfkrystal/idle/icon"
 	"log"
 	"os"
 	"time"
 )
 
 const interval time.Duration = 1 * time.Second
-const threshold int = 2 * 60 // in seconds
+const threshold int = 5 * 60 // in seconds
 const timeFormat = "Mon Jan 2 15:04:05"
 
 var abort = make(chan struct{})
@@ -37,8 +38,10 @@ loop:
 			var end time.Time
 			thresholdDuration := time.Duration(threshold) * time.Second
 			if idle {
+				systray.SetIcon(icon.DinoSleep)
 				end = time.Now().Add(-thresholdDuration)
 			} else {
+				systray.SetIcon(icon.Dino)
 				end = time.Now().Add(-interval)
 			}
 			fmt.Printf(stateChangeMsg(idle, start, end))
